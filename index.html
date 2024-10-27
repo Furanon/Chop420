@@ -151,8 +151,8 @@
 <h5>Different types of weed</h5>
 </div>
 <div class="col-block stats__col">
-<div class="stats__count">1505</div>
-<h5>Joints sold today</h5>
+<div class="stats__count">420</div>
+<h5>VIP Cards awarded this week</h5>
 </div>
 <div class="col-block stats__col">
 <div class="stats__count">54</div>
@@ -376,9 +376,27 @@
     <div style="margin-top: 10px;">
         <a href="https://www.google.com/maps/dir/?api=1&destination=19.358538%2C98.440882" target="_blank"<h3>Get Directions</h3></a>
     </div>
+     <script 
+    <script>
+        function initMap() {
+            var location = { lat: 37.7749, lng: -122.4194 }; // Default location, replace if needed
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 15,
+                center: location
+            });
 
-<div class="footer-image">
-   <!-- <img src="images/footer_image.png" alt="Footer Image" />
+            var marker = new google.maps.Marker({
+                position: location,
+                map: map
+            });
+        }
+    </script>
+</head>
+<body onload="initMap()">
+   
+    <div id="map"></div>
+    <h3><p><a href="https://maps.app.goo.gl/nTofnrZyBjqjhJMx7" target="_blank">View on Google Maps</a></p></h3>
+    
 </div>
 
 </body>
@@ -491,34 +509,13 @@
                             Fax: (+63) 555 0101
                         </p>
 </div>
-<ul class="contact-social">
-<li>
-<a href="#"><i aria-hidden="true" class="fa fa-facebook"></i></a>
-</li>
-<li>
-<a href="#"><i aria-hidden="true" class="fa fa-twitter"></i></a>
-</li>
-<li>
-<a href="#"><i aria-hidden="true" class="fa fa-instagram"></i></a>
-</li>
-<li>
-<a href="#"><i aria-hidden="true" class="fa fa-behance"></i></a>
-</li>
-<li>
-<a href="#"><i aria-hidden="true" class="fa fa-dribbble"></i></a>
-</li>
-</ul> <!-- end contact-social -->
-</div> <!-- end contact-info -->
-</div> <!-- end contact-secondary -->
-</div> <!-- end contact-content -->
-</section> <!-- end s-contact -->
-<!-- footer
+
     ================================================== -->
 <footer>
 <div class="row footer-main">
 <div class="col-six tab-full left footer-desc">
 <div class="footer-logo"> <img alt="Chop420 Logo" src="images\thinlogolp" style="width:300px;height:auto;border-radius:15px;"/></div>
-               
+  <h5>Find out more about our VIP card next time you visit</h5>             
 
             </div>
 <div class="col-six tab-full right footer-subscribe">
