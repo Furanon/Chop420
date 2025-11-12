@@ -7,13 +7,6 @@
 
     "use strict";
     
-    // Hotfix: ensure content isn’t hidden by AOS CSS even if JS fails
-    try {
-        var __aosFix = document.createElement('style');
-        __aosFix.setAttribute('data-hotfix', 'aos');
-        __aosFix.textContent = "[data-aos]{opacity:1!important;visibility:visible!important;transform:none!important}";
-        document.head.appendChild(__aosFix);
-    } catch (e) { /* no-op */ }
     
     var cfg = {
         scrollDuration : 800, // smoothscroll duration
@@ -21,6 +14,53 @@
     },
 
     $WIN = $(window);
+
+    // Ensure AOS updates after preloader/images so items in view are revealed
+    var refreshAOSAndRevealInView = function() {
+        try {
+            if (window.AOS) {
+                if (typeof window.AOS.refreshHard === 'function') window.AOS.refreshHard();
+                else if (typeof window.AOS.refresh === 'function') window.AOS.refresh();
+            }
+            var nodes = document.querySelectorAll('[data-aos]');
+            var vh = window.innerHeight || document.documentElement.clientHeight;
+            for (var i = 0; i < nodes.length; i++) {
+                var r = nodes[i].getBoundingClientRect();
+                if (r.top < vh - 40 && r.bottom > 0) {
+                    nodes[i].classList.add('aos-animate');
+                }
+            }
+        } catch (e) { /* no-op */ }
+    };
+
+    // Polyfill-style reveal that does not depend on AOS internals.
+    // It simply adds 'aos-animate' when items enter the viewport.
+    var ensureScrollReveal = function() {
+        try {
+            var targets = document.querySelectorAll('[data-aos]');
+            if (!targets.length) return;
+            if ('IntersectionObserver' in window) {
+                var io = new IntersectionObserver(function(entries){
+                    entries.forEach(function(entry){
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('aos-animate');
+                        }
+                    });
+                }, { root: null, rootMargin: '0px 0px -15% 0px', threshold: 0.01 });
+                for (var i=0;i<targets.length;i++) io.observe(targets[i]);
+            } else {
+                var revealOnScroll = function(){
+                    var vh = window.innerHeight || document.documentElement.clientHeight;
+                    for (var i=0;i<targets.length;i++){
+                        var r = targets[i].getBoundingClientRect();
+                        if (r.top < vh - 40 && r.bottom > 0) targets[i].classList.add('aos-animate');
+                    }
+                };
+                $WIN.on('scroll resize', revealOnScroll);
+                revealOnScroll();
+            }
+        } catch (e) { /* no-op */ }
+    };
 
     // Add the User Agent to the <html>
     // will be used for IE10 detection (Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0))
@@ -36,7 +76,10 @@
 
         var finish = function() {
             $("#loader").fadeOut("slow", function() {
-                $("#preloader").delay(200).fadeOut("slow");
+                $("#preloader").delay(200).fadeOut("slow", function(){
+                    // After preloader fully hides, update AOS in case offsets changed
+                    refreshAOSAndRevealInView();
+                });
             });
             $("html").removeClass('cl-preload');
             $("html").addClass('cl-loaded');
@@ -400,7 +443,8 @@
                 easing: 'ease-in-sine',
                 delay: 300,
                 once: true,
-                disable: 'mobile'
+                // Allow animations on mobile too to avoid hidden content when AOS is disabled
+                disable: false
             });
         } else {
             try {
@@ -410,6 +454,8 @@
                 }
             } catch (e) { /* no-op */ }
         }
+        // Also refresh once on window load to handle late asset loads
+        $WIN.on('load', refreshAOSAndRevealInView);
     };
 
 
@@ -497,6 +543,9 @@
         safeRun(clContactForm, 'contactForm');
         safeRun(clAjaxChimp, 'ajaxChimp');
         safeRun(clBackToTop, 'backToTop');
+
+        // Always install the scroll reveal safety net (won't fight AOS)
+        ensureScrollReveal();
 
     })();
         

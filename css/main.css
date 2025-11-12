@@ -532,12 +532,6 @@ form,
     height: 100%;
 }
 
-/* Fail-safe: show AOS-tagged content even if AOS JS doesn't initialize. */
-[data-aos]:not(.aos-animate) {
-    opacity: 1 !important;
-    transform: none !important;
-    -webkit-transform: none !important;
-}
 
 .no-js #preloader, .oldie #preloader {
     display: none;
