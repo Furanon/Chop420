@@ -34,21 +34,31 @@
         
         $("html").addClass('cl-preload');
 
-        $WIN.on('load', function() {
-
-            //force page scroll position to top at page refresh
-            // $('html, body').animate({ scrollTop: 0 }, 'normal');
-
-            // will first fade out the loading animation 
+        var finish = function() {
             $("#loader").fadeOut("slow", function() {
-                // will fade out the whole DIV that covers the website.
-                $("#preloader").delay(300).fadeOut("slow");
-            }); 
-            
-            // for hero content animations 
+                $("#preloader").delay(200).fadeOut("slow");
+            });
             $("html").removeClass('cl-preload');
             $("html").addClass('cl-loaded');
-        
+        };
+
+        $WIN.on('load', function() {
+            // Wait for hero background (parallax source) to be ready before hiding preloader
+            try {
+                var hero = document.querySelector('.s-home');
+                var src = hero && hero.getAttribute('data-image-src');
+                if (src) {
+                    var img = new Image();
+                    img.onload = finish;
+                    img.onerror = finish; // fall back even if it errors
+                    img.src = src;
+                    if (img.complete) finish();
+                } else {
+                    finish();
+                }
+            } catch (e) {
+                finish();
+            }
         });
     };
 
