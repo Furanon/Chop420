@@ -517,22 +517,14 @@ form,
 }
 
 
-
-/* ===================================================================
+/* =================================================================== 
  * # preloader
  *
  * ------------------------------------------------------------------- */
+/* Disabled preloader to ensure content is visible even if JS fails */
 #preloader {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #050505;
-    z-index: 800;
-    height: 100%;
-    width: 100%;
-    display: table;
+    display: none !important;
+}
 }
 
 .no-js #preloader, .oldie #preloader {
@@ -1970,7 +1962,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 /* animate .home-content__main
  * ------------------------------------------------------------------- */
 html.cl-preload .home-content__main {
-    opacity: 0;
+    opacity: 1; /* keep visible even before cl-loaded */
 }
 
 html.cl-loaded .home-content__main {
