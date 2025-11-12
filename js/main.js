@@ -7,6 +7,14 @@
 
     "use strict";
     
+    // Hotfix: ensure content isn’t hidden by AOS CSS even if JS fails
+    try {
+        var __aosFix = document.createElement('style');
+        __aosFix.setAttribute('data-hotfix', 'aos');
+        __aosFix.textContent = "[data-aos]{opacity:1!important;visibility:visible!important;transform:none!important}";
+        document.head.appendChild(__aosFix);
+    } catch (e) { /* no-op */ }
+    
     var cfg = {
         scrollDuration : 800, // smoothscroll duration
         mailChimpURL   : 'https://chop420.us11.list-manage.com/subscribe/post?u=44cee798d4cc497c39e009f2c&amp;id=05f3f27ae5&amp;f_id=0012c3e1f0'   // mailchimp url
@@ -326,53 +334,46 @@
    /* Contact Form
     * ------------------------------------------------------ */
     var clContactForm = function() {
-        
-        /* local validation */
-        $('#contactForm').validate({
-        
-            /* submit via ajax */
-            submitHandler: function(form) {
-    
-                var sLoader = $('#submit-loader');
-    
-                $.ajax({
-    
-                    type: "POST",
-                    url: "inc/sendEmail.php",
-                    data: $(form).serialize(),
-                    beforeSend: function() { 
-    
-                        sLoader.slideDown("slow");
-    
-                    },
-                    success: function(msg) {
-    
-                        // Message was sent
-                        if (msg == 'OK') {
-                            sLoader.slideUp("slow"); 
-                            $('.message-warning').fadeOut();
-                            $('#contactForm').fadeOut();
-                            $('.message-success').fadeIn();
-                        }
-                        // There was an error
-                        else {
-                            sLoader.slideUp("slow"); 
-                            $('.message-warning').html(msg);
-                            $('.message-warning').slideDown("slow");
-                        }
-    
-                    },
-                    error: function() {
-    
-                        sLoader.slideUp("slow"); 
-                        $('.message-warning').html("Something went wrong. Please try again.");
-                        $('.message-warning').slideDown("slow");
-    
+        var $form = $('#contactForm');
+        if (!$form.length) return;
+
+        // Block any implicit form submission (Enter key, auto events)
+        $form.on('submit', function(e){ e.preventDefault(); return false; });
+
+        // Reset loader state on init
+        $('#submit-loader').hide();
+        // Init validation without auto events
+        $form.validate({ onkeyup:false, onclick:false, onfocusout:false });
+
+        // Only submit via explicit button click
+        $form.on('click', '.submitform', function(e){
+            e.preventDefault();
+            if (!$form.valid()) return false;
+
+            var sLoader = $('#submit-loader');
+            $.ajax({
+                type: 'POST',
+                url: 'inc/sendEmail.php',
+                data: $form.serialize(),
+                beforeSend: function(){ sLoader.slideDown('slow'); },
+                success: function(msg){
+                    if (msg == 'OK') {
+                        sLoader.slideUp('slow');
+                        $('.message-warning').fadeOut();
+                        $form.fadeOut();
+                        $('.message-success').fadeIn();
+                    } else {
+                        sLoader.slideUp('slow');
+                        $('.message-warning').html(msg).slideDown('slow');
                     }
-    
-                });
-            }
-    
+                },
+                error: function(){
+                    sLoader.slideUp('slow');
+                    $('.message-warning').html('Something went wrong. Please try again.').slideDown('slow');
+                }
+            });
+
+            return false;
         });
     };
 
@@ -460,20 +461,32 @@
     * ------------------------------------------------------ */
     (function ssInit() {
         
-        clPreloader();
-        clMenuOnScrolldown();
-        clOffCanvas();
-        clPhotoswipe();
-        clStatCount();
-        clMasonryFolio();
-        clSlickSlider();
-        clSmoothScroll();
-        clPlaceholder();
-        clAlertBoxes();
-        clContactForm();
-        clAOS();
-        clAjaxChimp();
-        clBackToTop();
+        // Run critical visibility fallback first so content is visible even if
+        // a later init step throws. Then continue with guarded init calls.
+        try { clAOS(); } catch (e) { /* ensure [data-aos] content is visible */ }
+
+        var safeRun = function(fn, name) {
+            try { fn(); }
+            catch (e) {
+                if (window && window.console) {
+                    console.warn((name||'init') + ' failed:', e);
+                }
+            }
+        };
+
+        safeRun(clPreloader, 'preloader');
+        safeRun(clMenuOnScrolldown, 'menu');
+        safeRun(clOffCanvas, 'offCanvas');
+        safeRun(clPhotoswipe, 'photoswipe');
+        safeRun(clStatCount, 'statCount');
+        safeRun(clMasonryFolio, 'masonry');
+        safeRun(clSlickSlider, 'slick');
+        safeRun(clSmoothScroll, 'smoothScroll');
+        safeRun(clPlaceholder, 'placeholder');
+        safeRun(clAlertBoxes, 'alertBoxes');
+        safeRun(clContactForm, 'contactForm');
+        safeRun(clAjaxChimp, 'ajaxChimp');
+        safeRun(clBackToTop, 'backToTop');
 
     })();
         
