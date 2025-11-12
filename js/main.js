@@ -333,7 +333,7 @@
             /* submit via ajax */
             submitHandler: function(form) {
     
-                var sLoader = $('.submit-loader');
+                var sLoader = $('#submit-loader');
     
                 $.ajax({
     
@@ -380,16 +380,25 @@
    /* Animate On Scroll
     * ------------------------------------------------------ */
     var clAOS = function() {
-        
-        AOS.init( {
-            offset: 200,
-            duration: 600,
-            easing: 'ease-in-sine',
-            delay: 300,
-            once: true,
-            disable: 'mobile'
-        });
-
+        // Guard against missing AOS library. If AOS is not loaded, ensure
+        // [data-aos] elements are visible by applying the 'aos-animate' class.
+        if (window.AOS && typeof window.AOS.init === 'function') {
+            window.AOS.init({
+                offset: 200,
+                duration: 600,
+                easing: 'ease-in-sine',
+                delay: 300,
+                once: true,
+                disable: 'mobile'
+            });
+        } else {
+            try {
+                var nodes = document.querySelectorAll('[data-aos]');
+                for (var i = 0; i < nodes.length; i++) {
+                    nodes[i].classList.add('aos-animate');
+                }
+            } catch (e) { /* no-op */ }
+        }
     };
 
 
