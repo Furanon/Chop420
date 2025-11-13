@@ -579,6 +579,40 @@
         };
         safeRun(clLazyMap, 'lazyMap');
 
+        // Ensure hero parallax falls back to PNG if WebP fails on the live server.
+        var clParallaxWebpSafe = function() {
+            try {
+                var $hero = $('.s-home[data-parallax="scroll"]');
+                if (!$hero.length) return;
+                // If we've already applied fallback once (e.g., on SPA navigations), skip.
+                if (window.__parallaxFallbackApplied) return;
+
+                // Test-load the actual WebP asset to catch server 404/MIME issues.
+                var testImg = new Image();
+                testImg.onload = function() {
+                    // WebP loaded successfully; do nothing (plugin already initialized via plugins.js)
+                };
+                testImg.onerror = function() {
+                    // If WebP fails, swap to PNG and re-initialize parallax.
+                    try {
+                        // Destroy existing instance if present
+                        if (typeof $hero.parallax === 'function') {
+                            try { $hero.parallax('destroy'); } catch (e) { /* ignore */ }
+                        }
+                        $hero.attr('data-image-src', 'images/canfields.png');
+                        if (typeof $hero.parallax === 'function') {
+                            $hero.parallax({ imageSrc: 'images/canfields.png' });
+                        }
+                        window.__parallaxFallbackApplied = true;
+                    } catch (e) { /* no-op */ }
+                };
+                // Kick off the check as soon as DOM is ready, before images are all settled.
+                testImg.src = 'images/canfields.webp';
+            } catch (e) { /* no-op */ }
+        };
+        // Run after the plugin's own DOMReady init so we can destroy/reinit if needed.
+        jQuery(function(){ clParallaxWebpSafe(); });
+
     })();
         
         
