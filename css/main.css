@@ -2539,6 +2539,9 @@ html.no-csstransitions .home-content__main {
 }
 
 .item-folio__thumb img {
+    aspect-ratio: 3 / 2;
+    width: 100%;
+    height: auto;
     vertical-align: bottom;
     -webkit-transition: all 0.5s ease-in-out;
     transition: all 0.5s ease-in-out;
@@ -2743,6 +2746,10 @@ html.no-csstransitions .home-content__main {
     position: relative;
 }
 
+
+.map-embed { width: 100%; height: 300px; display: flex; align-items: center; justify-content: center; background: #e6e6e6; }
+.map-embed iframe { width: 100%; height: 100%; border: 0; }
+#map-embed-button { z-index: 1; }
 
 /* ------------------------------------------------------------------- 
  * ## slider

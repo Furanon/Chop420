@@ -547,6 +547,38 @@
         // Always install the scroll reveal safety net (won't fight AOS)
         ensureScrollReveal();
 
+        // Lazy-load Google Maps iframe on click/near viewport
+        var clLazyMap = function() {
+            try {
+                var wrap = document.getElementById('map-embed');
+                if (!wrap) return;
+                var btn = document.getElementById('map-embed-button');
+                var src = wrap.getAttribute('data-src');
+                var loaded = false;
+                var load = function(){
+                    if (loaded) return; loaded = true;
+                    var ifr = document.createElement('iframe');
+                    ifr.src = src;
+                    ifr.style.border = '0';
+                    ifr.style.width = '100%';
+                    ifr.style.height = '100%';
+                    ifr.setAttribute('allowfullscreen','');
+                    ifr.setAttribute('loading','lazy');
+                    ifr.setAttribute('referrerpolicy','no-referrer-when-downgrade');
+                    wrap.appendChild(ifr);
+                    if (btn) { btn.setAttribute('aria-expanded','true'); btn.style.display='none'; }
+                };
+                if (btn) btn.addEventListener('click', function(e){ e.preventDefault(); load(); });
+                if ('IntersectionObserver' in window) {
+                    var io = new IntersectionObserver(function(entries){
+                        entries.forEach(function(entry){ if (entry.isIntersecting) { load(); io.disconnect(); } });
+                    }, { root:null, rootMargin:'0px 0px -25% 0px', threshold:0.01});
+                    io.observe(wrap);
+                }
+            } catch (e) { /* no-op */ }
+        };
+        safeRun(clLazyMap, 'lazyMap');
+
     })();
         
         
