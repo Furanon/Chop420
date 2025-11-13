@@ -1751,6 +1751,8 @@ button::-moz-focus-inner, input::-moz-focus-inner {
     min-height: 786px;
     /* Fallback background so hero never appears solid black while parallax boots */
     background: #000 url("../images/canfields.png") center center / cover no-repeat;
+    /* Prefer WebP if supported */
+    background-image: image-set(url("../images/canfields.webp") type("image/webp"), url("../images/canfields.png") type("image/png"));
     position: relative;
     display: table;
 }
@@ -2538,10 +2540,16 @@ html.no-csstransitions .home-content__main {
     overflow: hidden;
 }
 
-.item-folio__thumb img {
+.item-folio__thumb {
+    position: relative;
     aspect-ratio: 3 / 2;
+    overflow: hidden;
+}
+.item-folio__thumb img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
+    display: block;
     vertical-align: bottom;
     -webkit-transition: all 0.5s ease-in-out;
     transition: all 0.5s ease-in-out;
