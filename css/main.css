@@ -529,9 +529,15 @@ form,
     background: #0a0a0a; /* dark backdrop */
     display: table;
     width: 100%;
-    height: 100%;
+height: 100%;
 }
 
+/* Non-JS fallback: if JS fails or is disabled, do not hide AOS-tagged content */
+html.no-js [data-aos] {
+    opacity: 1 !important;
+    transform: none !important;
+    -webkit-transform: none !important;
+}
 
 .no-js #preloader, .oldie #preloader {
     display: none;
